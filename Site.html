@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Árvores Frutíferas do IFES Cachoeiro</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2d6a4f;
+            --secondary: #52b788;
+            --accent: #74c69d;
+            --light-green: #b7e4c7;
+            --bg: #f8fffe;
+            --card-bg: #ffffff;
+            --text-dark: #1b4332;
+            --text-light: #52796f;
+            --shadow: rgba(45, 106, 79, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Manrope', sans-serif;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 4rem 0 5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.05)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,133.3C672,139,768,181,864,181.3C960,181,1056,139,1152,128C1248,117,1344,139,1392,149.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+            background-size: cover;
+            opacity: 0.3;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 1rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        header p {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            margin-bottom: 1.5rem;
+            opacity: 0.95;
+        }
+
+        .authors {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .author {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        .author i {
+            font-size: 1.1rem;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            margin-top: -3rem;
+            position: relative;
+            z-index: 10;
+            padding-bottom: 3rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px var(--shadow);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px var(--shadow);
+            border-color: var(--accent);
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Section Styling */
+        section {
+            padding: 4rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        /* Table Section */
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            border: 2px solid var(--light-green);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 4px rgba(82, 183, 136, 0.1);
+        }
+
+        .table-wrapper {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px var(--shadow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--primary);
+            color: white;
+        }
+
+        th {
+            padding: 1.25rem;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            user-select: none;
+        }
+
+        th:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        th i {
+            margin-left: 0.5rem;
+            opacity: 0.5;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--light-green);
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(183, 228, 199, 0.2);
+        }
+
+        td {
+            padding: 1.25rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            padding: 2rem 0;
+        }
+
+        .pagination button {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--secondary);
+            background: white;
+            color: var(--secondary);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: var(--secondary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .pagination span {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px var(--shadow);
+        }
+
+        .chart-card h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+
+        /* Map Section */
+        #map {
+            height: 600px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px var(--shadow);
+            overflow: hidden;
+        }
+
+        /* Gallery Section */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px var(--shadow);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            aspect-ratio: 4/3;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            padding: 1.5rem;
+            color: white;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            transform: translateY(0);
+        }
+
+        /* Summary Section */
+        .summary-content {
+            background: var(--card-bg);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px var(--shadow);
+            border-left: 5px solid var(--secondary);
+        }
+
+        .summary-content h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.75rem;
+        }
+
+        .summary-content p {
+            margin-bottom: 1.5rem;
+            color: var(--text-light);
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+
+        .summary-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .summary-content li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--text-light);
+        }
+
+        .summary-content li:before {
+            content: '\f06c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            position: relative;
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 10px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--accent);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 600px;
+            }
+
+            #map {
+                height: 400px;
+            }
+        }
+
+        /* Leaflet Popup Styling */
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px;
+        }
+
+        .leaflet-popup-content {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .popup-content {
+            padding: 0.5rem;
+        }
+
+        .popup-content h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .popup-content p {
+            color: var(--text-light);
+            margin: 0.25rem 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <h1>Árvores Frutíferas do IFES Cachoeiro</h1>
+            <p>Levantamento completo das árvores frutíferas do campus</p>
+            <div class="authors">
+                <div class="author">
+                    <i class="fas fa-user"></i>
+                    <span>Pedro Ghiotto Venturi Menon</span>
+                </div>
+                <div class="author">
+                    <i class="fas fa-user"></i>
+                    <span>Nicollas de Moura Paris</span>
+                </div>
+                <div class="author">
+                    <i class="fas fa-user"></i>
+                    <span>Pablo Silva Torres</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tree"></i>
+                    </div>
+                    <div class="stat-number">114</div>
+                    <div class="stat-label">Total de Árvores</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div class="stat-number">16</div>
+                    <div class="stat-label">Espécies Diferentes</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Table Section -->
+    <section id="tabela">
+        <div class="container">
+            <div class="section-header">
+                <h2>Dados das Árvores</h2>
+                <p>Explore os dados completos do levantamento</p>
+            </div>
+            
+            <div class="table-controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Buscar por espécie ou localização...">
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">ID <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(1)">Espécie <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(2)">Localização <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(3)">Latitude <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(4)">Longitude <i class="fas fa-sort"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button id="prevPage" onclick="changePage(-1)">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                <span id="pageInfo"></span>
+                <button id="nextPage" onclick="changePage(1)">
+                    Próxima <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Charts Section -->
+    <section id="graficos">
+        <div class="container">
+            <div class="section-header">
+                <h2>Análise Visual</h2>
+                <p>Visualize a distribuição das espécies</p>
+            </div>
+            
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>Distribuição por Espécie</h3>
+                    <div class="chart-container">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>Quantidade por Tipo</h3>
+                    <div class="chart-container">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section id="mapa">
+        <div class="container">
+            <div class="section-header">
+                <h2>Mapa Interativo</h2>
+                <p>Localização geográfica de cada árvore no campus</p>
+            </div>
+            <div id="map"></div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="galeria">
+        <div class="container">
+            <div class="section-header">
+                <h2>Galeria de Imagens</h2>
+                <p>Conheça as árvores frutíferas</p>
+            </div>
+            
+            <div class="gallery-grid" id="gallery">
+            </div>
+        </div>
+    </section>
+
+    <!-- Summary Section -->
+    <section id="resumo">
+        <div class="container">
+            <div class="section-header">
+                <h2>Resumo do Levantamento</h2>
+                <p>Metodologia e observações</p>
+            </div>
+            
+            <div class="summary-content">
+                <h3>Sobre o Projeto</h3>
+                <p>O levantamento das árvores frutíferas do campus do IFES Cachoeiro de Itapemirim foi realizado pelo Trio Parada Dura, composto pelos estudantes Pedro Ghiotto Venturi Menon, Nicollas de Moura Paris e Pablo Silva Torres. Esta atividade lúdica e didática teve como objetivo catalogar todas as espécies frutíferas presentes no campus.</p>
+
+                <h3>Metodologia</h3>
+                <p>A coleta de dados foi realizada através de:</p>
+                <ul>
+                    <li>Caminhamento sistemático por todas as áreas do campus</li>
+                    <li>Identificação visual das espécies</li>
+                    <li>Registro das coordenadas geográficas com GPS</li>
+                    <li>Documentação fotográfica</li>
+                    <li>Anotação de pontos de referência para cada árvore</li>
+                </ul>
+
+                <h3>Caminho Percorrido</h3>
+                <p>O levantamento cobriu diferentes áreas do campus:</p>
+                <ul>
+                    <li>Área atrás da Biblioteca e próximo ao Galpão de Mineração</li>
+                    <li>Margem esquerda e direita da Estrada de Saída do Campus</li>
+                    <li>Estacionamento e áreas entre os blocos administrativos</li>
+                    <li>Blocos pares e ímpares (Blocos 0 a 10)</li>
+                    <li>Margem direita da Entrada do CETEM</li>
+                    <li>Áreas próximas à Quadra e ao Pátio</li>
+                </ul>
+
+                <h3>Principais Descobertas</h3>
+                <p>Foram catalogadas <strong>114 árvores frutíferas</strong> de <strong>16 espécies diferentes</strong>, incluindo: Coqueiro (predominante), Mangueira, Bananeira, Limoeiro, Goiabeira, Mamoeiro, Cajueiro, Aceroleira, Abacateiro, Jambeira, Laranjeira, Caramboleira, Amoreira, Figueira e Videira.</p>
+
+                <h3>Observações Importantes</h3>
+                <ul>
+                    <li>A espécie mais comum no campus é o Coqueiro, seguido por Mangueiras e Bananeiras</li>
+                    <li>Há uma concentração significativa de árvores na área entre os blocos e nas margens da estrada</li>
+                    <li>O levantamento demonstrou a rica biodiversidade do campus</li>
+                    <li>A atividade proporcionou aprendizado prático sobre botânica e geolocalização</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal -->
+    <div id="imageModal" class="modal">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 IFES Cachoeiro de Itapemirim - Trio Parada Dura</p>
+            <p>Projeto de Levantamento de Árvores Frutíferas</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <script>
+        // CSV Data
+        const treeData = [
+            {id: 1, name: "Videira", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.8036206676028, lng: -41.154509189705898},
+            {id: 2, name: "Coqueiro", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803637833415099, lng: -41.154471547935799},
+            {id: 3, name: "Coqueiro", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.8037004500123, lng: -41.154408551319598},
+            {id: 4, name: "Amoreira", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803690759350001, lng: -41.1544500174452},
+            {id: 5, name: "Figueira", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.8036997045768, lng: -41.1543926028098},
+            {id: 6, name: "Limoeiro", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803666905409401, lng: -41.154373464598002},
+            {id: 7, name: "Mangueira", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803700450011899, lng: -41.154601528292297},
+            {id: 8, name: "Mangueira", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803640429598701, lng: -41.154633181038101},
+            {id: 9, name: "Bananeira", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.8036811847475, lng: -41.154718101258503},
+            {id: 10, name: "Bananeira", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803684506702002, lng: -41.154723789234303},
+            {id: 11, name: "Bananeira", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803680612524499, lng: -41.154703293572801},
+            {id: 12, name: "Bananeira", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803679673759, lng: -41.154710345733697},
+            {id: 13, name: "Bananeira", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803680975829302, lng: -41.154703682424604},
+            {id: 14, name: "Bananeira", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803675334321301, lng: -41.154703011872698},
+            {id: 15, name: "Mamoeiro", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803671999999999, lng: -41.154713999999998},
+            {id: 16, name: "Mamoeiro", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803657999999999, lng: -41.154800000000002},
+            {id: 17, name: "Mamoeiro", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803657999999999, lng: -41.154733},
+            {id: 18, name: "Mamoeiro", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803667000000001, lng: -41.154606000000001},
+            {id: 19, name: "Mamoeiro", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803667000000001, lng: -41.154617000000002},
+            {id: 20, name: "Mamoeiro", location: "Atrás do Bloco 0 próximo ao Galpão de Mineração", lat: -20.803592247220699, lng: -41.154572169113003},
+            {id: 21, name: "Goiabeira", location: "Atrás da Biblioteca", lat: -20.803660976910301, lng: -41.154888852441303},
+            {id: 22, name: "Aceroleira", location: "Atrás da Biblioteca e da Cantina", lat: -20.8036296351945, lng: -41.155028327309402},
+            {id: 23, name: "Mangueira", location: "Atrás da Cantina", lat: -20.8036321510573, lng: -41.155076474754303},
+            {id: 24, name: "Mangueira", location: "Atrás da Cantina", lat: -20.803629643719798, lng: -41.155118048993003},
+            {id: 25, name: "Laranjeira", location: "Atrás da Cantina", lat: -20.803643434073798, lng: -41.155143529979199},
+            {id: 26, name: "Cajueiro", location: "Em frente ao Galpão de Mineração", lat: -20.803580983851202, lng: -41.154264020527201},
+            {id: 27, name: "Cajueiro", location: "Em frente ao Galpão de Mineração", lat: -20.803568843406399, lng: -41.154356073415798},
+            {id: 28, name: "Cajueiro", location: "Ao lado do Pátio", lat: -20.803492468857101, lng: -41.155335830189301},
+            {id: 29, name: "Cajueiro", location: "Ao lado do Pátio", lat: -20.803383631215599, lng: -41.155315346834698},
+            {id: 30, name: "Coqueiro", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.803273066764199, lng: -41.155685709515303},
+            {id: 31, name: "Coqueiro", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.803237790059601, lng: -41.155699237506298},
+            {id: 32, name: "Coqueiro", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.803144211278202, lng: -41.155683431447102},
+            {id: 33, name: "Coqueiro", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.803061186447099, lng: -41.155666120049503},
+            {id: 34, name: "Coqueiro", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.802989837668299, lng: -41.155630829366402},
+            {id: 35, name: "Coqueiro", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.8028571952485, lng: -41.155558382196901},
+            {id: 36, name: "Coqueiro", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.802765609615001, lng: -41.155496253204802},
+            {id: 37, name: "Coqueiro", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.802675140823499, lng: -41.155456825190498},
+            {id: 38, name: "Coqueiro", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.802956259368401, lng: -41.1555985091384},
+            {id: 39, name: "Coqueiro", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.803162133598001, lng: -41.155685181035103},
+            {id: 40, name: "Caramboleira", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.803029311545799, lng: -41.155737752513097},
+            {id: 41, name: "Mangueira", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.802811698157001, lng: -41.155871682525301},
+            {id: 42, name: "Mangueira", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.8027798912943, lng: -41.155750214470899},
+            {id: 43, name: "Mangueira", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.8027498801716, lng: -41.155829629704698},
+            {id: 44, name: "Abacateiro", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.802804516959998, lng: -41.155662428424499},
+            {id: 45, name: "Abacateiro", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.802677007489699, lng: -41.155619802901299},
+            {id: 46, name: "Abacateiro", location: "Margem esquerda da Estrada de Saída do Campus", lat: -20.802966560088599, lng: -41.155707895649698},
+            {id: 47, name: "Coqueiro", location: "Margem direita da Estrada de Saída do Campus", lat: -20.802617237389001, lng: -41.1552645902091},
+            {id: 48, name: "Coqueiro", location: "Margem direita da Estrada de Saída do Campus", lat: -20.802669038144, lng: -41.155268852761402},
+            {id: 49, name: "Coqueiro", location: "Margem direita da Estrada de Saída do Campus", lat: -20.802714197762601, lng: -41.155278798716701},
+            {id: 50, name: "Coqueiro", location: "Margem direita da Estrada de Saída do Campus", lat: -20.802755372696499, lng: -41.155291586373501},
+            {id: 51, name: "Coqueiro", location: "Margem direita da Estrada de Saída do Campus", lat: -20.802730136448002, lng: -41.155233331492497},
+            {id: 52, name: "Coqueiro", location: "Margem direita da Estrada de Saída do Campus", lat: -20.802704900195302, lng: -41.155187864268399},
+            {id: 53, name: "Coqueiro", location: "Margem direita da Estrada de Saída do Campus", lat: -20.802336981707001, lng: -41.1552802195677},
+            {id: 54, name: "Coqueiro", location: "Margem direita da Estrada de Saída do Campus", lat: -20.802266585650301, lng: -41.155310057433603},
+            {id: 55, name: "Coqueiro", location: "Margem direita da Estrada de Saída do Campus", lat: -20.802185999999999, lng: -41.155327999999997},
+            {id: 56, name: "Coqueiro", location: "Margem direita da Estrada de Saída do Campus", lat: -20.802201502474301, lng: -41.155344157851701},
+            {id: 57, name: "Mangueira", location: "Lado esquerdo do Estacionamento", lat: -20.802629191408201, lng: -41.155153763849697},
+            {id: 58, name: "Goiabeira", location: "Atrás do Bloco Administrativo", lat: -20.802880225651801, lng: -41.155040095787797},
+            {id: 59, name: "Mangueira", location: "Atrás do Bloco 6", lat: -20.802856317644999, lng: -41.155041516637802},
+            {id: 60, name: "Mangueira", location: "Atrás do Bloco 6", lat: -20.802634898089199, lng: -41.154855192086799},
+            {id: 61, name: "Coqueiro", location: "Entre o Bloco Administrativo e o Bloco 2", lat: -20.802881183007798, lng: -41.154954858384897},
+            {id: 62, name: "Coqueiro", location: "Atrás do Bloco 2 e do Bloco 4", lat: -20.802851171906099, lng: -41.154931202783303},
+            {id: 63, name: "Coqueiro", location: "Atrás do Bloco 4", lat: -20.802821160798501, lng: -41.154909236867503},
+            {id: 64, name: "Coqueiro", location: "Atrás do Bloco 4", lat: -20.802823091994998, lng: -41.154908981192698},
+            {id: 65, name: "Coqueiro", location: "Atrás do Bloco 4", lat: -20.802771475546599, lng: -41.154878612350203},
+            {id: 66, name: "Coqueiro", location: "Atrás do Bloco 4", lat: -20.802739215257098, lng: -41.154860667125597},
+            {id: 67, name: "Coqueiro", location: "Atrás do Bloco 4", lat: -20.802737924845399, lng: -41.154855145517999},
+            {id: 68, name: "Coqueiro", location: "Atrás do Bloco 4 e Bloco 6", lat: -20.802727601549901, lng: -41.154857906321197},
+            {id: 69, name: "Coqueiro", location: "Atrás do Bloco 4 e Bloco 6", lat: -20.8026759850685, lng: -41.154827537479598},
+            {id: 70, name: "Coqueiro", location: "Atrás do Bloco 4 e Bloco 6", lat: -20.802646305584201, lng: -41.154802690245297},
+            {id: 71, name: "Coqueiro", location: "Atrás do Bloco 6", lat: -20.802631343762201, lng: -41.154789184654497},
+            {id: 72, name: "Coqueiro", location: "Atrás do Bloco 6", lat: -20.8026060233903, lng: -41.1547703064412},
+            {id: 73, name: "Coqueiro", location: "Atrás do Bloco 6", lat: -20.802588375855098, lng: -41.154760456938703},
+            {id: 74, name: "Coqueiro", location: "Atrás do Bloco 6", lat: -20.802555382632399, lng: -41.154740757933503},
+            {id: 75, name: "Coqueiro", location: "Atrás do Bloco 6", lat: -20.8025400369438, lng: -41.154724342095399},
+            {id: 76, name: "Coqueiro", location: "Atrás do Bloco 8", lat: -20.802447000000001, lng: -41.154674999999997},
+            {id: 77, name: "Coqueiro", location: "Atrás do Bloco 8", lat: -20.802436453512801, lng: -41.154665245078903},
+            {id: 78, name: "Coqueiro", location: "Atrás do Bloco 8", lat: -20.802409598537398, lng: -41.154640621322599},
+            {id: 79, name: "Coqueiro", location: "Atrás do Bloco 8", lat: -20.802378907131398, lng: -41.154620101525502},
+            {id: 80, name: "Coqueiro", location: "Atrás do Bloco 10", lat: -20.802268418016801, lng: -41.154554438174301},
+            {id: 81, name: "Coqueiro", location: "Atrás do Bloco 10", lat: -20.8022024314254, lng: -41.154510936204602},
+            {id: 82, name: "Coqueirinho", location: "Entre o Bloco 10 e a Quadra", lat: -20.802213999999999, lng: -41.154381000000001},
+            {id: 83, name: "Jambeira", location: "Entre o Bloco 8 e o Bloco 10", lat: -20.802389000000002, lng: -41.154383000000003},
+            {id: 84, name: "Jambeira", location: "Entre o Bloco 9 e o Bloco 7", lat: -20.802560726497301, lng: -41.1541042849448},
+            {id: 85, name: "Jambeira", location: "Entre o Bloco 9 e o Bloco 7", lat: -20.802556855257599, lng: -41.1542478467425},
+            {id: 86, name: "Coqueiro", location: "Entre o Bloco 9 e o Bloco 7", lat: -20.802560726497301, lng: -41.154185728656998},
+            {id: 87, name: "Coqueiro", location: "Entre o Bloco 9 e o Bloco 7", lat: -20.8025620169105, lng: -41.1541595010208},
+            {id: 88, name: "Jambeira", location: "Entre o Bloco 7 e o Bloco 5", lat: -20.802729770537301, lng: -41.154359659298002},
+            {id: 89, name: "Jambeira", location: "Entre o Bloco 6 e o Bloco 4", lat: -20.802706543122699, lng: -41.154719944197701},
+            {id: 90, name: "Coqueiro", location: "Entre o Bloco 2 e a Passagem", lat: -20.803071729273402, lng: -41.1547682582653},
+            {id: 91, name: "Coqueiro", location: "Entre o Bloco 2 e a Passagem", lat: -20.8030614060022, lng: -41.1548607451927},
+            {id: 92, name: "Coqueirinho", location: "Entre o Bloco 3 e o Bloco 1", lat: -20.803075077576601, lng: -41.154608964326698},
+            {id: 93, name: "Goiabeira", location: "Margem direita da Entrada do CETEM", lat: -20.802449874142901, lng: -41.153920056851099},
+            {id: 94, name: "Goiabeira", location: "Margem direita da Entrada do CETEM", lat: -20.802540489355, lng: -41.153966488103102},
+            {id: 95, name: "Goiabeira", location: "Margem direita da Entrada do CETEM", lat: -20.802608011385601, lng: -41.154008460040103},
+            {id: 96, name: "Goiabeira", location: "Margem direita da Entrada do CETEM", lat: -20.802721156341899, lng: -41.154085571272802},
+            {id: 97, name: "Limoeiro", location: "Margem direita da Entrada do CETEM", lat: -20.802627173037301, lng: -41.153988938209203},
+            {id: 98, name: "Limoeiro", location: "Margem direita da Entrada do CETEM", lat: -20.802682833060199, lng: -41.154054336343101},
+            {id: 99, name: "Mangueira", location: "Margem direita da Entrada do CETEM", lat: -20.802761304532002, lng: -41.154047503702301},
+            {id: 100, name: "Goiabeira", location: "Margem direita da Entrada do CETEM", lat: -20.802816052047501, lng: -41.154087523456901},
+            {id: 101, name: "Limoeiro", location: "Margem direita da Entrada do CETEM", lat: -20.802777586708, lng: -41.154075074098401},
+            {id: 102, name: "Limoeiro", location: "Margem direita da Entrada do CETEM", lat: -20.8027920039805, lng: -41.154098543427999},
+            {id: 103, name: "Limoeiro", location: "Margem direita da Entrada do CETEM", lat: -20.802824599546401, lng: -41.154112625025597},
+            {id: 104, name: "Limoeiro", location: "Margem direita da Entrada do CETEM", lat: -20.802692359619599, lng: -41.154046238581699},
+            {id: 105, name: "Limoeiro", location: "Margem direita da Entrada do CETEM", lat: -20.802856591165199, lng: -41.154120669884897},
+            {id: 106, name: "Aceroleira", location: "Margem direita da Entrada do CETEM", lat: -20.803174966258101, lng: -41.154339267310398},
+            {id: 107, name: "Aceroleira", location: "Em frente ao Galpão de Mineração", lat: -20.803021051695801, lng: -41.154004331496701},
+            {id: 108, name: "Bananeira", location: "Morro do Campo", lat: -20.802960961721801, lng: -41.154067484376597},
+            {id: 109, name: "Bananeira", location: "Morro do Campo", lat: -20.802945148567002, lng: -41.154023502906298},
+            {id: 110, name: "Bananeira", location: "Morro do Campo", lat: -20.802932498042001, lng: -41.154056207076501},
+            {id: 111, name: "Bananeira", location: "Morro do Campo", lat: -20.802962015932, lng: -41.154071995296697},
+            {id: 112, name: "Bananeira", location: "Morro do Campo", lat: -20.802919847516002, lng: -41.1540742507567},
+            {id: 113, name: "Mangueira", location: "Margem direita da Entrada do CETEM", lat: -20.803183300000001, lng: -41.154350000000001},
+            {id: 114, name: "Mangueira", location: "Margem direita da Entrada do CETEM", lat: -20.803243999999999, lng: -41.154353}
+        ];
+
+        // Gallery Images
+        const galleryImages = [
+            {url: "https://images.unsplash.com/photo-1709443021072-43b43a77a45e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODh8MHwxfHNlYXJjaHwxfHx0cm9waWNhbCUyMGZydWl0JTIwdHJlZXMlMjBuYXR1cmV8ZW58MHx8fHwxNzczODQyODcwfDA&ixlib=rb-4.1.0&q=85", title: "Árvores Frutíferas do Campus"},
+            {url: "https://images.unsplash.com/photo-1717819984372-bc69ed2ef6a0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODh8MHwxfHNlYXJjaHw0fHx0cm9waWNhbCUyMGZydWl0JTIwdHJlZXMlMjBuYXR1cmV8ZW58MHx8fHwxNzczODQyODcwfDA&ixlib=rb-4.1.0&q=85", title: "Laranja em Árvore"},
+            {url: "https://images.unsplash.com/photo-1717819984019-6122b5e9fa3c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODh8MHwxfHNlYXJjaHwzfHx0cm9waWNhbCUyMGZydWl0JTIwdHJlZXMlMjBuYXR1cmV8ZW58MHx8fHwxNzczODQyODcwfDA&ixlib=rb-4.1.0&q=85", title: "Frutas Cítricas"},
+            {url: "https://images.unsplash.com/photo-1573733615141-31ce14806f8e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODh8MHwxfHNlYXJjaHwyfHx0cm9waWNhbCUyMGZydWl0JTIwdHJlZXMlMjBuYXR1cmV8ZW58MHx8fHwxNzczODQyODcwfDA&ixlib=rb-4.1.0&q=85", title: "Natureza Verde"}
+        ];
+
+        // Table functionality
+        let currentPage = 1;
+        const rowsPerPage = 10;
+        let filteredData = [...treeData];
+        let sortColumn = -1;
+        let sortAscending = true;
+
+        function renderTable() {
+            const tableBody = document.getElementById('tableBody');
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const pageData = filteredData.slice(start, end);
+
+            tableBody.innerHTML = pageData.map(tree => `
+                <tr>
+                    <td>${tree.id}</td>
+                    <td><strong>${tree.name}</strong></td>
+                    <td>${tree.location}</td>
+                    <td>${tree.lat.toFixed(6)}</td>
+                    <td>${tree.lng.toFixed(6)}</td>
+                </tr>
+            `).join('');
+
+            updatePagination();
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            document.getElementById('pageInfo').textContent = `Página ${currentPage} de ${totalPages}`;
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+        }
+
+        function changePage(direction) {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            currentPage = Math.max(1, Math.min(currentPage + direction, totalPages));
+            renderTable();
+        }
+
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortAscending = !sortAscending;
+            } else {
+                sortColumn = column;
+                sortAscending = true;
+            }
+
+            filteredData.sort((a, b) => {
+                let valA, valB;
+                switch(column) {
+                    case 0: valA = a.id; valB = b.id; break;
+                    case 1: valA = a.name; valB = b.name; break;
+                    case 2: valA = a.location; valB = b.location; break;
+                    case 3: valA = a.lat; valB = b.lat; break;
+                    case 4: valA = a.lng; valB = b.lng; break;
+                }
+
+                if (typeof valA === 'string') {
+                    return sortAscending ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                }
+                return sortAscending ? valA - valB : valB - valA;
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            filteredData = treeData.filter(tree => 
+                tree.name.toLowerCase().includes(searchTerm) ||
+                tree.location.toLowerCase().includes(searchTerm)
+            );
+            currentPage = 1;
+            renderTable();
+        });
+
+        // Count species
+        function countSpecies() {
+            const counts = {};
+            treeData.forEach(tree => {
+                counts[tree.name] = (counts[tree.name] || 0) + 1;
+            });
+            return counts;
+        }
+
+        // Initialize Charts
+        function initCharts() {
+            const speciesCounts = countSpecies();
+            const labels = Object.keys(speciesCounts);
+            const data = Object.values(speciesCounts);
+
+            // Pie Chart
+            const pieCtx = document.getElementById('pieChart').getContext('2d');
+            new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#2d6a4f', '#52b788', '#74c69d', '#95d5b2', '#b7e4c7',
+                            '#d8f3dc', '#1b4332', '#40916c', '#6a994e', '#a7c957',
+                            '#bc4749', '#f2cc8f', '#81b29a', '#e07a5f', '#3d5a80', '#98c1d9'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                font: { size: 12 }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Bar Chart
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Quantidade',
+                        data: data,
+                        backgroundColor: '#52b788',
+                        borderColor: '#2d6a4f',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 5 }
+                        },
+                        x: {
+                            ticks: {
+                                font: { size: 11 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize Map
+        function initMap() {
+            const centerLat = treeData.reduce((sum, tree) => sum + tree.lat, 0) / treeData.length;
+            const centerLng = treeData.reduce((sum, tree) => sum + tree.lng, 0) / treeData.length;
+
+            const map = L.map('map').setView([centerLat, centerLng], 16);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Create custom icons for different species
+            const iconColors = {
+                'Coqueiro': '#2d6a4f',
+                'Mangueira': '#52b788',
+                'Bananeira': '#f2cc8f',
+                'Limoeiro': '#e07a5f',
+                'Goiabeira': '#81b29a',
+                'default': '#74c69d'
+            };
+
+            treeData.forEach(tree => {
+                const color = iconColors[tree.name] || iconColors.default;
+                
+                const customIcon = L.divIcon({
+                    className: 'custom-marker',
+                    html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>`,
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                });
+
+                L.marker([tree.lat, tree.lng], { icon: customIcon })
+                    .bindPopup(`
+                        <div class="popup-content">
+                            <h4>${tree.name}</h4>
+                            <p><strong>ID:</strong> ${tree.id}</p>
+                            <p><strong>Local:</strong> ${tree.location}</p>
+                            <p><strong>Coordenadas:</strong><br>${tree.lat.toFixed(6)}, ${tree.lng.toFixed(6)}</p>
+                        </div>
+                    `)
+                    .addTo(map);
+            });
+        }
+
+        // Initialize Gallery
+        function initGallery() {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = galleryImages.map((img, index) => `
+                <div class="gallery-item" onclick="openModal('${img.url}')">
+                    <img src="${img.url}" alt="${img.title}">
+                    <div class="gallery-overlay">
+                        <h4>${img.title}</h4>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Modal functions
+        function openModal(imgUrl) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'block';
+            modalImg.src = imgUrl;
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // Close modal on click outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('imageModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Initialize everything on load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderTable();
+            initCharts();
+            initMap();
+            initGallery();
+        });
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"9de4d95d9e73a8d4","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.9.1","token":"7f7b0fd8732c4326aae4b9d58d5c514a"}' crossorigin="anonymous"></script>
+</body>
+</html>
