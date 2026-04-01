@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Árvores Frutíferas do IFES Cachoeiro</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <h1>Árvores Frutíferas do IFES Cachoeiro</h1>
+            <p>Levantamento completo das árvores frutíferas do campus</p>
+            <div class="authors">
+                <div class="author">
+                    <i class="fas fa-user"></i>
+                    <span>Pedro Ghiotto Venturi Menon</span>
+                </div>
+                <div class="author">
+                    <i class="fas fa-user"></i>
+                    <span>Nicollas de Moura Paris</span>
+                </div>
+                <div class="author">
+                    <i class="fas fa-user"></i>
+                    <span>Pablo Silva Torres</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tree"></i>
+                    </div>
+                    <div class="stat-number">114</div>
+                    <div class="stat-label">Total de Árvores</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div class="stat-number">16</div>
+                    <div class="stat-label">Espécies Diferentes</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Table Section -->
+    <section id="tabela">
+        <div class="container">
+            <div class="section-header">
+                <h2>Dados das Árvores</h2>
+                <p>Explore os dados completos do levantamento</p>
+            </div>
+            
+            <div class="table-controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Buscar por espécie ou localização...">
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">ID <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(1)">Espécie <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(2)">Localização <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(3)">Latitude <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(4)">Longitude <i class="fas fa-sort"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button id="prevPage" onclick="changePage(-1)">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                <span id="pageInfo"></span>
+                <button id="nextPage" onclick="changePage(1)">
+                    Próxima <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Charts Section -->
+    <section id="graficos">
+        <div class="container">
+            <div class="section-header">
+                <h2>Análise Visual</h2>
+                <p>Visualize a distribuição das espécies</p>
+            </div>
+            
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>Distribuição por Espécie</h3>
+                    <div class="chart-container">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>Quantidade por Tipo</h3>
+                    <div class="chart-container">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section id="mapa">
+        <div class="container">
+            <div class="section-header">
+                <h2>Mapa Interativo</h2>
+                <p>Localização geográfica de cada árvore no campus</p>
+            </div>
+            <div id="map"></div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="galeria">
+        <div class="container">
+            <div class="section-header">
+                <h2>Galeria de Imagens</h2>
+                <p>Conheça as árvores frutíferas</p>
+            </div>
+            
+            <div class="gallery-grid" id="gallery">
+            </div>
+        </div>
+    </section>
+
+    <!-- Summary Section -->
+    <section id="resumo">
+        <div class="container">
+            <div class="section-header">
+                <h2>Resumo do Levantamento</h2>
+                <p>Metodologia e observações</p>
+            </div>
+            
+            <div class="summary-content">
+                <h3>Sobre o Projeto</h3>
+                <p>O levantamento das árvores frutíferas do campus do IFES Cachoeiro de Itapemirim foi realizado pelo Trio Parada Dura, composto pelos estudantes Pedro Ghiotto Venturi Menon, Nicollas de Moura Paris e Pablo Silva Torres. Esta atividade lúdica e didática teve como objetivo catalogar todas as espécies frutíferas presentes no campus.</p>
+
+                <h3>Metodologia</h3>
+                <p>A coleta de dados foi realizada através de:</p>
+                <ul>
+                    <li>Caminhamento sistemático por todas as áreas do campus</li>
+                    <li>Identificação visual das espécies</li>
+                    <li>Registro das coordenadas geográficas com GPS</li>
+                    <li>Documentação fotográfica</li>
+                    <li>Anotação de pontos de referência para cada árvore</li>
+                </ul>
+
+                <h3>Caminho Percorrido</h3>
+                <p>O levantamento cobriu diferentes áreas do campus:</p>
+                <ul>
+                    <li>Área atrás da Biblioteca e próximo ao Galpão de Mineração</li>
+                    <li>Margem esquerda e direita da Estrada de Saída do Campus</li>
+                    <li>Estacionamento e áreas entre os blocos administrativos</li>
+                    <li>Blocos pares e ímpares (Blocos 0 a 10)</li>
+                    <li>Margem direita da Entrada do CETEM</li>
+                    <li>Áreas próximas à Quadra e ao Pátio</li>
+                </ul>
+
+                <h3>Principais Descobertas</h3>
+                <p>Foram catalogadas <strong>114 árvores frutíferas</strong> de <strong>16 espécies diferentes</strong>, incluindo: Coqueiro (predominante), Mangueira, Bananeira, Limoeiro, Goiabeira, Mamoeiro, Cajueiro, Aceroleira, Abacateiro, Jambeira, Laranjeira, Caramboleira, Amoreira, Figueira e Videira.</p>
+
+                <h3>Observações Importantes</h3>
+                <ul>
+                    <li>A espécie mais comum no campus é o Coqueiro, seguido por Mangueiras e Bananeiras</li>
+                    <li>Há uma concentração significativa de árvores na área entre os blocos e nas margens da estrada</li>
+                    <li>O levantamento demonstrou a rica biodiversidade do campus</li>
+                    <li>A atividade proporcionou aprendizado prático sobre botânica e geolocalização</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal -->
+    <div id="imageModal" class="modal">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 IFES Cachoeiro de Itapemirim - Trio Parada Dura</p>
+            <p>Projeto de Levantamento de Árvores Frutíferas</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <script src="script.js"></script>
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"9de4d95d9e73a8d4","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.9.1","token":"7f7b0fd8732c4326aae4b9d58d5c514a"}' crossorigin="anonymous"></script>
+</body>
+</html>
